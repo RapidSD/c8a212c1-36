@@ -29,13 +29,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Create .env file from secrets
+      - name: Create .env file from GitHub variables and secrets
         run: |
-          echo "NEXT_PUBLIC_SHOPIFY_SHOP=${{ secrets.SHOPIFY_SHOP }}" >> .env
+          echo "🔧 Setting up environment variables..."
+          echo "NEXT_PUBLIC_SHOPIFY_SHOP=${{ vars.SHOPIFY_SHOP }}" >> .env
           echo "NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=${{ secrets.SHOPIFY_STOREFRONT_ACCESS_TOKEN }}" >> .env
-          echo "SHOPIFY_REVALIDATION_SECRET=${{ secrets.SHOPIFY_REVALIDATION_SECRET || '' }}" >> .env
-          echo "COMPANY_NAME=${{ secrets.COMPANY_NAME || 'My Store' }}" >> .env
-          echo "SITE_NAME=${{ secrets.SITE_NAME || 'My Shopify Store' }}" >> .env
+          echo "PRIVATE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=${{ secrets.PRIVATE_SHOPIFY_STOREFRONT_ACCESS_TOKEN }}" >> .env
+          echo ""
+          echo "📋 Environment variables configured:"
+          echo "NEXT_PUBLIC_SHOPIFY_SHOP=${{ vars.SHOPIFY_SHOP || 'NOT_SET' }}"
+          echo "NEXT_PUBLIC_SHOPIFY_STOREFRONT_ACCESS_TOKEN=$(echo '${{ secrets.SHOPIFY_STOREFRONT_ACCESS_TOKEN }}' | sed 's/./*/g' | cut -c1-10)..."
+          echo "PRIVATE_SHOPIFY_STOREFRONT_ACCESS_TOKEN=$(echo '${{ secrets.PRIVATE_SHOPIFY_STOREFRONT_ACCESS_TOKEN }}' | sed 's/./*/g' | cut -c1-10)..."
+          echo ""
+          echo "📄 Final .env file contents:"
+          cat .env | sed 's/SHOPIFY_STOREFRONT_ACCESS_TOKEN=.*/SHOPIFY_STOREFRONT_ACCESS_TOKEN=[HIDDEN]/g'
 
       - name: Build project
         run: |
